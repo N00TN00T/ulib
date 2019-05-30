@@ -4,6 +4,7 @@
  This file needs:
  - <experimental/filesystem>
  - <string>
+ - <fstream>
 */
 
 #include "ulib/FileManagement/IO.hpp"

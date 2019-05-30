@@ -1,3 +1,3 @@
 A C++ utility library that's really just written for learning and saving time for myself as I don't need to rewrite common utility stuff in other projects
 
-ulib.hpp includes all standard libraries needed, but if you don't want everything ulib offers you can include separate headers but include the libraries they need yourself. The libraries needed are documented in respective file.
+ulib.hpp includes all standard libraries needed, but if would like to manage where these are included yourself you can define ULIB_NO_INCLUDE and no external libraries will be included. If you only want to manage some yourself but let this library include some, you can define similar macros for each external library. For example ULIB_NO_INCLUDE_ASSERT will stop ulib from including <assert.h>. Check ulib.hpp to see what libraries are needed.

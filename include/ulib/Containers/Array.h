@@ -25,7 +25,16 @@ namespace ulib {
 
         /* Reallocate memory. Not responsible for freeing memory if length is shrinked */
         inline void Resize(uint64_t newLength) {
-            m_data = (T*)realloc(m_data, ToByteSize(newLength));
+            //m_data = (T*)realloc(m_data, ToByteSize(newLength));
+
+			T* _newData = new T[newLength];
+
+			uint64_t _cpyLen = newLength > m_length ? m_length : newLength;
+			memcpy(_newData, m_data, ToByteSize(_cpyLen));
+
+			delete[] m_data;
+			m_data = _newData;
+
             m_length = newLength;
         }
 

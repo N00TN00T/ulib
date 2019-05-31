@@ -84,30 +84,33 @@ int main() {
         }
     };
     printf("Creating array of 5 doggies\n");
-    ulib::Array<Doggy> _doggies(5);
-    _doggies[0] = { "Jacky", 3 };
-    _doggies[1] = { "Snuffy", 12 };
-    _doggies[2] = { "Ivy", 8 };
-    _doggies[3] = { "Lennart", 1 };
+    ulib::Array<Doggy*> _doggies(5);
+    _doggies[0] = new Doggy { "Jacky", 3 };
+    _doggies[1] = new Doggy { "Snuffy", 12 };
+    _doggies[2] = new Doggy { "Ivy", 8 };
+    _doggies[3] = new Doggy { "Lennart", 1 };
+	_doggies[4] = new Doggy();
     std::cout << "Actual length: " << _doggies.GetLength() << std::endl;
     printf("Doggies:\n");
     for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
-        _doggies[i].Print();
+        _doggies[i]->Print();
     }
     printf("\nAfter naming stray puppy to 'Lyra':\n");
-    _doggies[4].name = "Lyra";
+    _doggies[4]->name = "Lyra";
     for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
-        _doggies[i].Print();
+        _doggies[i]->Print();
     }
     printf("\nFinding 2 more puppies...:\n");
     _doggies.Resize(_doggies.GetLength() + 2);
+	_doggies[5] = new Doggy();
+	_doggies[6] = new Doggy();
     for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
-        _doggies[i].Print();
+        _doggies[i]->Print();
     }
     printf("\nDeleting 1 puppy :(...\n");
     _doggies.Resize(_doggies.GetLength() - 1);
     for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
-        _doggies[i].Print();
+        _doggies[i]->Print();
     }
     printf("\n=====================Queue TEST=======================\n");
     struct Order {
@@ -135,5 +138,7 @@ int main() {
         printf("PROCESSING: "); _order->Print();
         std::cout << "Customer '" << _order->customer << "' was served" << std::endl;
     }
+
+	std::cin.get();
     return 0;
 }

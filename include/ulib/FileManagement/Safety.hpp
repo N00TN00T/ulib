@@ -28,7 +28,6 @@ namespace ulib { namespace File {
 
     inline std::string to_absolute(const std::string& path) {
         if (!is_absolute(path)) return fs::absolute(path);
-
         else return "";
     }
 

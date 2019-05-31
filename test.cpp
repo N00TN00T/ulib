@@ -30,11 +30,6 @@ void print_file_info(const string& filePath, const string& name) {
         if (_readSuccess) {
             std::cout << "FILE CONTENT: \n" << _content << std::endl;
         }
-        printf("Input new content to write to file:\n > ");
-        char _input[420] = "";
-        std::cin.getline(_input, 420);
-        bool _writeSuccess = ulib::File::write(filePath, _input);
-        std::cout << "COULD WRITE FILE: " << BOOL_TO_Y_N(_writeSuccess) << std::endl;
     }
 }
 
@@ -79,6 +74,66 @@ int main() {
     print_file_info("/home/charlie/Dev/ulib/test_files/testfile", "testfile");
     printf("\n");
     print_file_info("sadkfhuaskiudf", "non-existent file");
+    printf("\n");
+    printf("\n=====================Array TEST=======================\n");
+    struct Doggy {
+        std::string name = "Stray puppy";
+        int age = 0;
+        void Print() {
+            std::cout << "Doggy '" << name << "' is " << age << " years old" << std::endl;
+        }
+    };
+    printf("Creating array of 5 doggies\n");
+    ulib::Array<Doggy> _doggies(5);
+    _doggies[0] = { "Jacky", 3 };
+    _doggies[1] = { "Snuffy", 12 };
+    _doggies[2] = { "Ivy", 8 };
+    _doggies[3] = { "Lennart", 1 };
+    std::cout << "Actual length: " << _doggies.GetLength() << std::endl;
+    printf("Doggies:\n");
+    for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
+        _doggies[i].Print();
+    }
+    printf("\nAfter naming stray puppy to 'Lyra':\n");
+    _doggies[4].name = "Lyra";
+    for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
+        _doggies[i].Print();
+    }
+    printf("\nFinding 2 more puppies...:\n");
+    _doggies.Resize(_doggies.GetLength() + 2);
+    for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
+        _doggies[i].Print();
+    }
+    printf("\nDeleting 1 puppy :(...\n");
+    _doggies.Resize(_doggies.GetLength() - 1);
+    for (uint64_t i = 0; i < _doggies.GetLength(); i++) {
+        _doggies[i].Print();
+    }
+    printf("\n=====================Queue TEST=======================\n");
+    struct Order {
+        std::string customer = "Johnny";
+        std::string name = "Pasta Carbonara";
+        double cost = 1.2;
 
+        void Print() {
+            std::cout << "Customer '" << customer << "' wants '" << name << "' for $" << cost << std::endl;
+        }
+    };
+    printf("Creating a queue of orders...\n");
+    ulib::Stack<Order*> _orders;
+    std::cout << "Is queue empty?: " << (_orders.IsEmpty() ? "YES" : "NO") << std::endl;
+    printf("Placing 3 orders...\n");
+    _orders.Push(new Order());
+    _orders.Push(new Order { "Alisha", "Scrambled Eggs", 0.9 });
+    _orders.Push(new Order { "Troy", "Baked potato", 1.7 });
+    std::cout << "Is queue empty?: " << (_orders.IsEmpty() ? "YES" : "NO") << std::endl;
+    printf("Front order: \n");
+    _orders.GetTop()->Print();
+    printf("\nProcessing orders...\n");
+    while (!_orders.IsEmpty()) {
+        auto _order = _orders.Pop();
+        printf("PROCESSING: "); _order->Print();
+        std::cout << "Customer '" << _order->customer << "' was served" << std::endl;
+    }
     return 0;
 }

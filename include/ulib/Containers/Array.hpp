@@ -12,11 +12,13 @@ namespace ulib {
     public:
         inline Array(const uint64_t& length)
             : m_length(length) {
+            assert(length > 0);
             m_data = new T[length];
         }
 
         inline T& Get(const uint64_t& index) {
-            return *static_cast<T*>((void*)&m_data[index]);
+            assert(index < m_length);
+            return m_data[index];
         }
 
         inline T& operator[](const uint64_t& index) {

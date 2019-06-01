@@ -12,12 +12,22 @@ namespace ulib {
     class SharedPtr
         : public SmartPtr<T> {
     public:
+        inline SharedPtr();
         inline SharedPtr(T* ptr);
         inline SharedPtr(T src);
         inline SharedPtr(const SharedPtr& src);
         ~SharedPtr();
 
         inline const uint64_t& GetRefCount() const { return *m_refCount; }
+
+        template <typename TPtr>
+        friend bool operator==(const SharedPtr<TPtr> &a, const SharedPtr<TPtr> &b);
+        template <typename TPtr>
+        friend bool operator!=(const SharedPtr<TPtr> &a, const SharedPtr<TPtr> &b);
+
+        inline bool operator!() {
+            return !this->m_ptr;
+        }
 
     private:
         uint64_t    *m_refCount;
@@ -32,6 +42,11 @@ namespace ulib {
         }
 
     };
+
+    template <typename T>
+    inline SharedPtr<T>::SharedPtr() {
+        this->m_ptr = nullptr;
+    }
 
     template <typename T>
     inline SharedPtr<T>::SharedPtr(T* ptr)
@@ -68,4 +83,15 @@ namespace ulib {
             m_refCount = nullptr;
         }
     }
+
+    template <typename TPtr>
+    inline bool operator== (const SharedPtr<TPtr> &a, const SharedPtr<TPtr> &b) {
+        return  (!a.IsGarbage() && !b.IsGarbage()) &&
+                a.Get() == b.Get();
+    }
+    template <typename TPtr>
+    inline bool operator!= (const SharedPtr<TPtr> &a, const SharedPtr<TPtr> &b) {
+        return !(a == b);
+    }
+
 }

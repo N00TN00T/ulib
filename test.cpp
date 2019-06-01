@@ -2,6 +2,9 @@
 #include <iostream>
 #include <stdio.h>
 
+#include <cstdio>
+#include <ctime>
+
 #include "ulib.hpp"
 
 
@@ -123,7 +126,7 @@ int main() {
         }
     };
     printf("Creating a queue of orders...\n");
-    ulib::Stack<Order*> _orders;
+    ulib::Queue<Order*> _orders;
     std::cout << "Is queue empty?: " << (_orders.IsEmpty() ? "YES" : "NO") << std::endl;
     printf("Placing 3 orders...\n");
     _orders.Push(new Order());
@@ -137,6 +140,41 @@ int main() {
         auto _order = _orders.Pop();
         printf("PROCESSING: "); _order->Print();
         std::cout << "Customer '" << _order->customer << "' was served" << std::endl;
+    }
+    printf("\n=====================GrowingArray TEST=======================\n");
+    struct MagicEffect {
+        std::string name = "Fire Ball";
+        double strength = 10;
+        double manaCost = 3;
+
+        void Print() {
+            std::cout << "Spell '" << name << /*"': Strength=" << strength << ", manaCost=" << manaCost <<*/ std::endl;
+        }
+    };
+    typedef ulib::SharedPtr<MagicEffect> MagicEffectPtr;
+    printf("Initializing growing array of MagicEffects with starting capacity of 4\n");
+    ulib::GrowingArray<MagicEffectPtr> _effects(4);
+    std::cout << "Array length: " << _effects.GetLength() << ", Array capacity: " << _effects.GetCapacity() << std::endl;
+    _effects.Push(MagicEffectPtr(MagicEffect()));
+    _effects.Push(MagicEffectPtr({ "Ice Storm", 40, 15 }));
+    _effects.Push(MagicEffectPtr({ "Spark Blast", 30, 8 }));
+    printf("Adding 3 magic effects...");
+    std::cout << "Array length: " << _effects.GetLength() << ", Array capacity: " << _effects.GetCapacity() << std::endl;
+
+    //for (auto _effect : _effects) { assert(_effect.Get() != nullptr); _effect->Print(); }
+
+    auto __begin = _effects.begin() ;
+    auto __end = _effects.end() ;
+    std::cout << __begin.GetValue() << ", " << __end.GetValue() << std::endl;
+    for ( ; __begin != __end; ++__begin) {
+
+        std::cout << __begin.GetValue() << ", " << __end.GetValue() << std::endl;
+        auto _effect = *__begin;
+        std::cout << __begin.GetValue() << ", " << __end.GetValue() << std::endl;
+        std::cout << _effect->name << std::endl;
+
+        _effect->Print();
+
     }
 
 	std::cin.get();

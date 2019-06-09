@@ -7,11 +7,26 @@
 
 #include "ulib.hpp"
 
-
-
 typedef std::string string;
 
 #define BOOL_TO_Y_N(x) (x ? "YES" : "NO")
+
+string dec_to_hex(int dec) {
+    std::stringstream ss;
+    ss<< std::hex << dec; // int decimal_value
+    std::string res ( ss.str() );
+
+    return res;
+}
+
+int hex_to_dec(string hex) {
+    std::stringstream ss;
+    ss  << hex ; // std::string hex_value
+    int dec = 0;
+    ss >> std::hex >> dec ; //int decimal_value
+
+    return dec;
+}
 
 void print_file_info(const string& filePath, const string& name) {
     std::cout << "TESTING FILE '" << name << "'" << std::endl;
@@ -176,6 +191,23 @@ int main() {
         _effect->Print();
 
     }
+    printf("\n=====================PNG TEST=======================\n");
+
+    string _bytes = "";
+    assert(ulib::File::read("test_files/sprite.png", &_bytes));
+    int _lineLen = 0;
+    for (int i = 0; i < _bytes.size(); i++) {
+        auto _b = _bytes[i];
+        int _byteNum = ((int)_b) + 128;
+        string _byteStr = dec_to_hex(_byteNum);
+        size_t _stringSize = _byteStr.size();
+        size_t _0Size = 3 - _stringSize;
+        string _0String = string(_0Size, '0');
+        std::cout << _0String << _byteStr << " ";
+        _lineLen += _byteStr.size() + _0Size;
+        if (_lineLen >= 60) { printf("\n"); _lineLen = 0; };
+    }
+    printf("\n");
 
 	std::cin.get();
     return 0;

@@ -28,4 +28,8 @@ namespace ulib { namespace File {
         return false;
     }
 
+    inline bool copy(const std::string& src, const std::string& dst) {
+	    fs::copy(src, dst);
+    }
+
 } }

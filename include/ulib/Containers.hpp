@@ -40,7 +40,7 @@ namespace ulib {
     }
 }
 
-#include "ulib/Containers/Array.hpp"
-#include "ulib/Containers/Queue.hpp"
-#include "ulib/Containers/Stack.hpp"
-#include "ulib/Containers/GrowingArray.hpp"
+#include "Containers/Array.hpp"
+#include "Containers/Queue.hpp"
+#include "Containers/Stack.hpp"
+#include "Containers/GrowingArray.hpp"

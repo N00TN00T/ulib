@@ -6,3 +6,4 @@
 */
 
 #include "MemoryManagement/SharedPtr.hpp"
+#include "MemoryManagement/UniquePtr.hpp"

@@ -86,6 +86,40 @@ int main() {
         printf("REF 1 DATA: ");
         (*sptr).Print();
     }
+    printf("======================UniquePtr TEST====================\n");
+    {
+        struct Data {
+            float foo, bar;
+            void Print() {
+                std::cout << "foo = " << foo << ", bar = " << bar << std::endl;
+            }
+        };
+        typedef ulib::UniquePtr<Data> DataPtr;
+
+
+        printf("CREATING REF 1\n");
+        DataPtr sptr({5, 3});
+        std::cout << "REF 1 IS OWNER?: " << BOOL_TO_Y_N(sptr.IsOwner()) << std::endl;
+        printf("REF 1 DATA: ");
+        sptr->Print();
+        {
+            DataPtr sptr1;
+            printf("CREATING REF 2\n");
+            sptr1 = sptr;
+            std::cout << "REF 1 IS OWNER?: " << BOOL_TO_Y_N(sptr.IsOwner()) << std::endl;
+            std::cout << "REF 2 IS OWNER?: " << BOOL_TO_Y_N(sptr1.IsOwner()) << std::endl;
+            printf("REF 2 DATA: ");
+            (*sptr1).Print();
+            printf("CHANGING FOO IN REF 2 TO 7\n");
+            sptr1->foo = 7;
+            printf("REF 2 DATA: ");
+            sptr1->Print();
+            printf("LEAVING SCOPE FOR REF 2\n");
+        }
+        std::cout << "REF 1 IS OWNER?: " << BOOL_TO_Y_N(sptr.IsOwner()) << std::endl;
+        printf("REF 1 DATA: ");
+        (*sptr).Print();
+    }
     printf("\n====================FileSystem TEST===================\n");
     print_file_info("test_files/data.dat", "data.dat");
     printf("\n");
@@ -156,59 +190,8 @@ int main() {
         printf("PROCESSING: "); _order->Print();
         std::cout << "Customer '" << _order->customer << "' was served" << std::endl;
     }
-    printf("\n=====================GrowingArray TEST=======================\n");
-    struct MagicEffect {
-        std::string name = "Fire Ball";
-        double strength = 10;
-        double manaCost = 3;
 
-        void Print() {
-            std::cout << "Spell '" << name << /*"': Strength=" << strength << ", manaCost=" << manaCost <<*/ std::endl;
-        }
-    };
-    typedef ulib::SharedPtr<MagicEffect> MagicEffectPtr;
-    printf("Initializing growing array of MagicEffects with starting capacity of 4\n");
-    ulib::GrowingArray<MagicEffectPtr> _effects(4);
-    std::cout << "Array length: " << _effects.GetLength() << ", Array capacity: " << _effects.GetCapacity() << std::endl;
-    _effects.Push(MagicEffectPtr(MagicEffect()));
-    _effects.Push(MagicEffectPtr({ "Ice Storm", 40, 15 }));
-    _effects.Push(MagicEffectPtr({ "Spark Blast", 30, 8 }));
-    printf("Adding 3 magic effects...");
-    std::cout << "Array length: " << _effects.GetLength() << ", Array capacity: " << _effects.GetCapacity() << std::endl;
 
-    //for (auto _effect : _effects) { assert(_effect.Get() != nullptr); _effect->Print(); }
 
-    auto __begin = _effects.begin() ;
-    auto __end = _effects.end() ;
-    std::cout << __begin.GetValue() << ", " << __end.GetValue() << std::endl;
-    for ( ; __begin != __end; ++__begin) {
-
-        std::cout << __begin.GetValue() << ", " << __end.GetValue() << std::endl;
-        auto _effect = *__begin;
-        std::cout << __begin.GetValue() << ", " << __end.GetValue() << std::endl;
-        std::cout << _effect->name << std::endl;
-
-        _effect->Print();
-
-    }
-    printf("\n=====================PNG TEST=======================\n");
-
-    string _bytes = "";
-    assert(ulib::File::read("test_files/sprite.png", &_bytes));
-    int _lineLen = 0;
-    for (size_t i = 0; i < _bytes.size(); i++) {
-        auto _b = _bytes[i];
-        int _byteNum = ((int)_b) + 128;
-        string _byteStr = dec_to_hex(_byteNum);
-        size_t _stringSize = _byteStr.size();
-        size_t _0Size = 3 - _stringSize;
-        string _0String = string(_0Size, '0');
-        std::cout << _0String << _byteStr << " ";
-        _lineLen += _byteStr.size() + _0Size;
-        if (_lineLen >= 60) { printf("\n"); _lineLen = 0; };
-    }
-    printf("\n");
-
-	std::cin.get();
     return 0;
 }

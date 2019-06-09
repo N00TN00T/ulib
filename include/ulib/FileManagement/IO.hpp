@@ -29,7 +29,13 @@ namespace ulib { namespace File {
     }
 
     inline bool copy(const std::string& src, const std::string& dst) {
-	    fs::copy(src, dst);
+	    std::error_code _err;
+	    fs::copy(src, dst, _err);
+	    return _err.value() == 0;
+    }
+
+    inline bool remove(const std::string& filePath) {
+	return fs::remove(filePath);
     }
 
 } }

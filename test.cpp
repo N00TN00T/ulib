@@ -196,7 +196,7 @@ int main() {
     string _bytes = "";
     assert(ulib::File::read("test_files/sprite.png", &_bytes));
     int _lineLen = 0;
-    for (int i = 0; i < _bytes.size(); i++) {
+    for (size_t i = 0; i < _bytes.size(); i++) {
         auto _b = _bytes[i];
         int _byteNum = ((int)_b) + 128;
         string _byteStr = dec_to_hex(_byteNum);

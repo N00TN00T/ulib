@@ -26,6 +26,7 @@ namespace ulib {
         inline UniquePtr<T>& operator=(const UniquePtr<T>& src) {
             m_isOwner = false;
             this->m_ptr = src.m_ptr;
+            return *this;
         }
 
         inline bool operator!() {

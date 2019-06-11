@@ -120,6 +120,18 @@ int main() {
         printf("REF 1 DATA: ");
         (*sptr).Print();
     }
+    printf("\n====================Bitset TEST===================\n");
+    ulib::Bitset _bitset;
+    std::cout << "Setting bit 5" << std::endl;
+    _bitset.SetBit(5);
+    std::cout << "Is bit 5 set? " << BOOL_TO_Y_N(_bitset.GetBit(5)) << std::endl;
+
+    std::cout << "Setting bit 67" << std::endl;
+    _bitset.SetBit(67);
+    std::cout << "Is bit 67 set? " << BOOL_TO_Y_N(_bitset.GetBit(67)) << std::endl;
+    std::cout << "Is bit 3 set? " << BOOL_TO_Y_N(_bitset.GetBit(3)) << std::endl;
+    std::cout << "Is bit 1025 set? " << BOOL_TO_Y_N(_bitset.GetBit(1025)) << std::endl;
+
     printf("\n====================FileSystem TEST===================\n");
     print_file_info("test_files/data.dat", "data.dat");
     printf("\n");

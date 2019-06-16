@@ -14,7 +14,6 @@ namespace ulib {
     public:
         inline SharedPtr();
         inline SharedPtr(T* ptr);
-        inline SharedPtr(T src);
         inline SharedPtr(const SharedPtr& src);
         ~SharedPtr();
 
@@ -58,16 +57,6 @@ namespace ulib {
         this->m_ptr = ptr;
         HandeledPtrs()[_address].value = true;
 
-    }
-    template <typename T>
-    inline SharedPtr<T>::SharedPtr(T src)
-        : m_refCount(new uint64_t) {
-        *m_refCount = 1;
-        T *_ptr = new T(src);
-        uintptr_t _address = reinterpret_cast<uintptr_t>(_ptr);
-        assert(!HandeledPtrs()[_address].value);
-        this->m_ptr = _ptr;
-        HandeledPtrs()[_address].value = true;
     }
     template <typename T>
     inline SharedPtr<T>::SharedPtr(const SharedPtr& src)

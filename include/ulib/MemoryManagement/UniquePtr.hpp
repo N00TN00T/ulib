@@ -14,7 +14,6 @@ namespace ulib {
     public:
         inline UniquePtr();
         inline UniquePtr(T* ptr);
-        inline UniquePtr(T src);
         inline UniquePtr(const UniquePtr& src);
         ~UniquePtr();
 
@@ -64,15 +63,6 @@ namespace ulib {
         this->m_ptr = ptr;
         HandeledPtrs()[_address].value = true;
 
-    }
-    template <typename T>
-    inline UniquePtr<T>::UniquePtr(T src)
-        : m_isOwner(true) {
-        T *_ptr = new T(src);
-        uintptr_t _address = reinterpret_cast<uintptr_t>(_ptr);
-        assert(!HandeledPtrs()[_address].value);
-        this->m_ptr = _ptr;
-        HandeledPtrs()[_address].value = true;
     }
     template <typename T>
     inline UniquePtr<T>::UniquePtr(const UniquePtr& src)

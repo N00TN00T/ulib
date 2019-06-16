@@ -10,6 +10,8 @@ namespace ulib {
     template <typename T>
     class Array {
     public:
+        typedef Iterator<Array<T>, T> Iter;
+
         inline Array(const uint64_t& length)
             : m_length(length) {
             assert(length > 0);
@@ -41,6 +43,13 @@ namespace ulib {
         }
 
         inline const uint64_t& GetLength() const { return m_length; }
+
+        inline Iter begin() {
+            return Iter(*this, 0);
+        }
+        inline Iter end() {
+            return Iter(*this, m_length - 1);
+        }
 
     private:
         inline size_t ToByteSize(uint64_t count) { return count * sizeof(T); }

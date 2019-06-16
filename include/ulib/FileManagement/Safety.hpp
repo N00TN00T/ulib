@@ -28,7 +28,7 @@ namespace ulib { namespace File {
 
     inline std::string to_absolute(const std::string& path) {
         if (!is_absolute(path)) return std::string((const char*)fs::absolute(path).c_str());
-        else return "";
+        else return path;
     }
 
     inline bool has_extension(const std::string& file) {
@@ -37,6 +37,10 @@ namespace ulib { namespace File {
 
     inline std::string extension_of(const std::string& file) {
         return std::string((const char*)fs::path(file).extension().c_str());
+    }
+
+    inline std::string directory_of(const std::string& file) {
+        return std::string((const char*)fs::path(file).parent_path().c_str());
     }
 
 } }

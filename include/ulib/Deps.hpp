@@ -16,5 +16,8 @@
     #include <unordered_map>
 #endif
 #ifndef ULIB_NO_INCLUDE_FILESYSTEM
-    #include <experimental/filesystem>
+	#include <experimental/filesystem>
+#endif
+#if defined (_WIN32) && !defined(ULIB_NO_INCLUDE_WINDOWS)
+	#include <Windows.h>
 #endif

@@ -52,6 +52,8 @@ namespace ulib {
             m_first = m_first->next;
             delete _garbage;
             return _ret;
+
+            if (!m_first) m_last = nullptr;
         }
 
         /* Get the value at the front of the queue */

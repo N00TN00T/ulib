@@ -31,7 +31,7 @@ namespace ulib {
             Node *_node = new Node { new T(value), nullptr };
             Node *_temp = m_last;
 
-            if (!m_last) { m_last = _node; m_first = _node; }
+            if (!m_last || !m_first) { m_last = _node; m_first = _node; }
             else { m_last = _node; _temp->next = _node; }
         }
 

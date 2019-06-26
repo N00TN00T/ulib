@@ -11,7 +11,7 @@ namespace ulib {
     class Stack {
     public:
         struct Node {
-            T* value;
+            T value;
             Node* next;
         };
 
@@ -28,7 +28,7 @@ namespace ulib {
 
         /* Push a value to the top of the stack */
         inline void Push(const T& value) {
-            Node *_node = new Node { new T(value), nullptr };
+            Node *_node = new Node { value, nullptr };
             Node *_temp = m_top;
 
             m_top = _node;
@@ -36,9 +36,9 @@ namespace ulib {
         }
 
         /* Remove the value at the top of the stack; the last pushed value, and return it */
-        inline T& Pop() {
+        inline T Pop() {
             assert(m_top != nullptr);
-            T& _ret = *m_top->value;
+            T _ret = m_top->value;
             Node *_garbage = m_top;
             m_top = m_top->next;
             delete _garbage;
@@ -46,7 +46,7 @@ namespace ulib {
         }
 
         /* Get the value at the top of the stack */
-        inline T& GetTop() { assert(m_top != NULL); return *m_top->value; }
+        inline T& GetTop() { assert(m_top != NULL); return m_top->value; }
 
         /* Is this stack empty; are there no elements? */
         inline bool IsEmpty() const { return !m_top; }

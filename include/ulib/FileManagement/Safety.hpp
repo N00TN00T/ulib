@@ -29,18 +29,6 @@ namespace ulib { namespace File {
 
     inline std::string to_absolute(const std::string& path) {
 #ifdef _WIN32
-		/* fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows
-			fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows fuck windows*/
 		int _len;
 		int _slength = (int)path.length() + 1;
 		_len = MultiByteToWideChar(CP_ACP, 0, path.c_str(), _slength, 0, 0);
@@ -76,7 +64,24 @@ namespace ulib { namespace File {
     }
 
     inline std::string extension_of(const std::string& file) {
+#ifdef _WIN32
+		std::string _extension;
+		bool _foundDot = false;
+		for (int i = file.size() - 1; i >= 0; i--) {
+			const auto& _char = file[i];
+
+			if (_char == '/' || _char == '\\') break;
+
+			_extension.insert(_extension.begin(), _char);
+
+			if (_char == '.') { _foundDot = true; break; }
+		}
+
+		if (_foundDot)	return _extension;
+		else			return "";
+#else
         return std::string((const char*)fs::path(file).extension().c_str());
+#endif
     }
 
     inline std::string directory_of(const std::string& file) {

@@ -14,6 +14,8 @@ namespace ulib { namespace File {
     std::string to_absolute(const std::string& path);
     bool has_extension(const std::string& file);
     std::string extension_of(const std::string& file);
+    std::string name_of(const std::string& path);
+    std::string to_portable_path(const std::string& path);
 
     inline bool exists(const std::string& file) {
         return fs::exists(file);
@@ -21,7 +23,7 @@ namespace ulib { namespace File {
 
     inline bool is_absolute(const std::string& file) {
         return exists(file) && fs::path(file).is_absolute();
-		
+
     }
     inline bool is_relative(const std::string& file) {
         return exists(file) && fs::path(file).is_relative();
@@ -36,7 +38,7 @@ namespace ulib { namespace File {
 		MultiByteToWideChar(CP_ACP, 0, path.c_str(), _slength, _windowsCancerBuf, _len);
 		std::wstring _windowsCancerPathString(_windowsCancerBuf);
 		delete[] _windowsCancerBuf;
-		
+
 		wchar_t _windowsCancerRawRetVal[4096] = TEXT("");
 
 		GetFullPathNameW (
@@ -45,7 +47,7 @@ namespace ulib { namespace File {
 			_windowsCancerRawRetVal,
 			{NULL}
 		);
-		
+
 		std::wstring _windowsCancerRetVal = _windowsCancerRawRetVal;
 
 		int size_needed = WideCharToMultiByte(CP_UTF8, 0, &_windowsCancerRetVal[0], (int)_windowsCancerRetVal.size(), NULL, 0, NULL, NULL);
@@ -86,6 +88,22 @@ namespace ulib { namespace File {
 
     inline std::string directory_of(const std::string& file) {
         return std::string((const char*)fs::path(file).parent_path().c_str());
+    }
+
+    inline std::string name_of(const std::string& path) {
+        return std::string((const char*)fs::path(path).filename().c_str());
+    }
+
+    inline std::string to_portable_path(const std::string& path) {
+        std::string _portable = path;
+
+        for (size_t i = 0; i < _portable.size(); i++) {
+            if (_portable[i] == '\\') {
+                _portable[i] = '/';
+            }
+        }
+
+        return _portable;
     }
 
 } }

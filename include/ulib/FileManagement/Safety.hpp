@@ -8,7 +8,7 @@
 
 namespace ulib { namespace File {
 
-    bool exists(const std::string& file);
+    bool exists(const std::string& file, bool ignoreExtension = false);
     bool is_absolute(const std::string& file);
     bool is_relative(const std::string& file);
     std::string to_absolute(const std::string& path);
@@ -16,9 +16,19 @@ namespace ulib { namespace File {
     std::string extension_of(const std::string& file);
     std::string name_of(const std::string& path);
     std::string to_portable_path(const std::string& path);
+    std::string without_extension(const std::string& path);
 
-    inline bool exists(const std::string& file) {
-        return fs::exists(file);
+    inline bool exists(const std::string& path, bool ignoreExtension) {
+        if (ignoreExtension) {
+            for (const auto & _entry : fs::directory_iterator(path)) {
+                if (without_extension(_entry.path().c_str()) == without_extension(path)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return fs::exists(path);
+        }
     }
 
     inline bool is_absolute(const std::string& file) {
@@ -104,6 +114,14 @@ namespace ulib { namespace File {
         }
 
         return _portable;
+    }
+
+    inline std::string without_extension(const std::string& path) {
+        if (!has_extension(path)) return path;
+        else {
+            auto _lastindex = path.find_last_of(".");
+            return path.substr(0, _lastindex);
+        }
     }
 
 } }

@@ -10,7 +10,7 @@ namespace ulib {
     template <typename T>
     class Array {
     public:
-        typedef Iterator<Array<T>, T> Iter;
+        typedef ulib::Iterator<Array<T>, T> Iter;
 
         inline Array(const uint64_t& length)
             : m_length(length) {
@@ -26,6 +26,12 @@ namespace ulib {
         inline T& operator[](const uint64_t& index) {
             return Get(index);
         }
+
+		inline Array<T> Copy() const {
+			Array<T> _cp(m_length);
+			memcpy(_cp.m_data, m_data, ToByteSize(m_length));
+			return _cp;
+		}
 
         /* Reallocate memory. Not responsible for freeing memory if length is shrinked */
         inline void Resize(uint64_t newLength) {
@@ -52,7 +58,7 @@ namespace ulib {
         }
 
     private:
-        inline size_t ToByteSize(uint64_t count) { return count * sizeof(T); }
+        inline size_t ToByteSize(uint64_t count) const { return count * sizeof(T); }
 
     private:
         uint64_t m_length;

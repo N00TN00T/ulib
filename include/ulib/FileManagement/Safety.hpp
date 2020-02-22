@@ -4,6 +4,7 @@
  This file needs:
  - <experimental/filesystem>
  - <string>
+ - <functional>
 */
 
 namespace ulib { namespace File {
@@ -21,7 +22,7 @@ namespace ulib { namespace File {
     inline bool exists(const std::string& path, bool ignoreExtension) {
         if (ignoreExtension) {
             for (const auto & _entry : fs::directory_iterator(path)) {
-                if (without_extension(_entry.path().c_str()) == without_extension(path)) {
+                if (without_extension(_entry.path().generic_string()) == without_extension(path)) {
                     return true;
                 }
             }
@@ -40,35 +41,8 @@ namespace ulib { namespace File {
     }
 
     inline std::string to_absolute(const std::string& path) {
-#ifdef _WIN32
-		int _len;
-		int _slength = (int)path.length() + 1;
-		_len = MultiByteToWideChar(CP_ACP, 0, path.c_str(), _slength, 0, 0);
-		wchar_t* _windowsCancerBuf = new wchar_t[_len];
-		MultiByteToWideChar(CP_ACP, 0, path.c_str(), _slength, _windowsCancerBuf, _len);
-		std::wstring _windowsCancerPathString(_windowsCancerBuf);
-		delete[] _windowsCancerBuf;
-
-		wchar_t _windowsCancerRawRetVal[4096] = TEXT("");
-
-		GetFullPathNameW (
-			_windowsCancerPathString.c_str(),
-			4096,
-			_windowsCancerRawRetVal,
-			{NULL}
-		);
-
-		std::wstring _windowsCancerRetVal = _windowsCancerRawRetVal;
-
-		int size_needed = WideCharToMultiByte(CP_UTF8, 0, &_windowsCancerRetVal[0], (int)_windowsCancerRetVal.size(), NULL, 0, NULL, NULL);
-		std::string _retVal(size_needed, 0);
-		WideCharToMultiByte(CP_UTF8, 0, &_windowsCancerRetVal[0], (int)_windowsCancerRetVal.size(), &_retVal[0], size_needed, NULL, NULL);
-
-		return _retVal;
-#else
-        if (!is_absolute(path)) return std::string((const char*)fs::absolute(path).c_str());
+        if (!is_absolute(path)) return fs::absolute(path).generic_string();
         else return path;
-#endif
     }
 
     inline bool has_extension(const std::string& file) {
@@ -76,32 +50,15 @@ namespace ulib { namespace File {
     }
 
     inline std::string extension_of(const std::string& file) {
-#ifdef _WIN32
-		std::string _extension;
-		bool _foundDot = false;
-		for (int i = file.size() - 1; i >= 0; i--) {
-			const auto& _char = file[i];
-
-			if (_char == '/' || _char == '\\') break;
-
-			_extension.insert(_extension.begin(), _char);
-
-			if (_char == '.') { _foundDot = true; break; }
-		}
-
-		if (_foundDot)	return _extension;
-		else			return "";
-#else
-        return std::string((const char*)fs::path(file).extension().c_str());
-#endif
+        return fs::path(file).extension().generic_string();
     }
 
     inline std::string directory_of(const std::string& file) {
-        return std::string((const char*)fs::path(file).parent_path().c_str());
+        return fs::path(file).parent_path().generic_string();
     }
 
     inline std::string name_of(const std::string& path) {
-        return std::string((const char*)fs::path(path).filename().c_str());
+		return fs::path(path).filename().generic_string();
     }
 
     inline std::string to_portable_path(const std::string& path) {
@@ -124,4 +81,63 @@ namespace ulib { namespace File {
         }
     }
 
-} }
+	inline bool is_same_path(const std::string& a, const std::string& b) {
+		return fs::equivalent(a, b);
+	}
+
+	inline bool has_directory(const std::string& file, const std::string& dirPath) {
+		std::string _temp = file;
+		do {
+			if (ulib::File::is_same_path(_temp, dirPath)) return true;
+			_temp = directory_of(_temp);
+		} while (_temp != "");
+
+		return false;
+	}
+
+	} 
+
+	namespace Directory {
+
+		enum IterationFlags {
+			FILES = 1 << 1, DIRECTORIES = 1 << 2, RECURSIVE = 1 << 3
+		};
+
+		inline bool exists(const std::string& path) {
+			return fs::exists(path);
+		}
+
+		inline bool is_directory(const std::string& path) {
+			return exists(path) && fs::is_directory(path);
+		}
+
+		inline void for_each(const std::string& dir, int flags, std::function<void(std::string)> fn) {
+			if (!is_directory(dir)) return;
+
+			if (flags & RECURSIVE) {
+				for (auto _item : fs::recursive_directory_iterator(dir)) {
+					std::string _path =_item.path().generic_string();
+
+					if ((is_directory(_path) && flags & DIRECTORIES)
+						|| (!is_directory(_path) && flags & FILES)) {
+						fn(_path);
+					}
+				}
+			} else {
+				for (auto _item : fs::directory_iterator(dir)) {
+					std::string _path = _item.path().generic_string();
+
+					if ((is_directory(_path) && flags & DIRECTORIES)
+						|| (!is_directory(_path) && flags & FILES)) {
+						fn(_path);
+					}
+				}
+			}
+			
+		}
+
+	}
+
+}
+
+

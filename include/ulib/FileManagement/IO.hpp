@@ -1,36 +1,146 @@
 #pragma once
 
+//#include "Safety.hpp"
+
 /*
  This file needs:
  - <experimental/filesystem>
  - <string>
  - <fstream>
+ - <vector>
 */
 
-namespace ulib { namespace File {
+#define ULIB_FAIL (1)
+#define ULIB_REPLACE (2)
 
-    inline bool write(const std::string& file, const std::string& data) {
-        std::ofstream _file(file);
-        if (_file.is_open()) { _file << data; _file.close(); return true; }
+namespace ulib { 
+	
+	namespace Directory {
+
+		inline bool create(const std::string& path, std::string& failReason = std::string()) {
+			std::error_code _err;
+			fs::create_directory(path, _err);
+			failReason = _err.message();
+			return _err.value() == 0;
+		}
+
+		inline bool create_all(const std::string& path, std::string& failReason = std::string()) {
+			std::error_code _err;
+			fs::create_directories(path, _err);
+			failReason = _err.message();
+			return _err.value() == 0;
+		}
+
+	}
+	
+	namespace File {
+
+		std::string directory_of(const std::string& file);
+
+		inline size_t file_size(const std::string& file)
+		{
+			std::ifstream in(file, std::ifstream::ate | std::ifstream::binary);
+			return in.tellg();
+		}
+
+
+		typedef std::basic_ofstream<unsigned char, std::char_traits<unsigned char>> uofstream;
+		typedef std::basic_ifstream<unsigned char, std::char_traits<unsigned char>> uifstream;
+
+    inline bool write(const std::string& file, const std::string& data, bool binary = false) 
+	{
+		if (!fs::exists(directory_of(file))) Directory::create_all(directory_of(file));
+		std::ofstream t;
+		if (binary)	t.open(file.c_str(), std::ios::binary);
+		else		t.open(file.c_str());
+        if (t.is_open()) 
+		{ 
+			t << data; 
+			if (t.bad()) { t.close(); return false; }
+			t.close();
+			return true; 
+		}
+		
+		t.close();
         return false;
     }
 
-    inline bool read(const std::string& file, std::string *out) {
-        *out = "";
-        std::string _line;
-        std::ifstream _file(file, std::ios::in);
-        if (_file.is_open()) {
-            while (std::getline(_file, _line)) *out += _line + "\n";
-            _file.close();
-            return true;
-        }
+	inline bool write(const std::string& file, const std::vector<unsigned char>& data, bool binary = false)
+	{
+		if (!fs::exists(directory_of(file))) Directory::create_all(directory_of(file));
+		uofstream t;
+		if (binary)	t.open(file.c_str(), std::ios::binary);
+		else		t.open(file.c_str());
+		if (t.is_open())
+		{
+			t.write(&data[0], data.size());
+			if (t.bad()) { t.close(); return false; }
+			t.close();
+			return true;
+		}
 
-        return false;
+		t.close();
+		return false;
+	}
+
+	
+
+    inline bool read(const std::string& file, std::string *out, bool binary = false) {
+        
+		std::ifstream t;
+		if (binary)	t.open(file.c_str(), std::ios::binary);
+		else		t.open(file.c_str());
+		if (t.is_open())
+		{
+			std::string str((std::istreambuf_iterator<char>(t)),
+				std::istreambuf_iterator<char>());
+			if (t.bad()) { t.close(); return false; }
+			*out = str;
+			t.close();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
     }
+	inline bool read(const std::string& file, std::vector<unsigned char>* out, bool binary = false)
+	{
 
-    inline bool copy(const std::string& src, const std::string& dst) {
+		uifstream t;
+		if (binary)	t.open(file.c_str(), std::ios::binary);
+		else		t.open(file.c_str());
+		if (t.is_open())
+		{
+			out->resize(file_size(file));
+			t.read(out->data(), out->size());
+			if (t.bad()) { t.close(); return false; }
+			t.close();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+    inline bool copy(const std::string& src, const std::string& dst, int dstExistFlags = ULIB_FAIL, std::string& failReason = std::string()) {
+
+		if (!fs::exists(src)) return false;
+
+		if (fs::exists(dst)) {
+			if (dstExistFlags & ULIB_FAIL) {
+				return false;
+			} else if (dstExistFlags & ULIB_REPLACE) {
+				fs::remove(dst);
+			} else return false;
+		}
+
+		Directory::create_all(fs::path(dst).parent_path().generic_string());
+
 	    std::error_code _err;
 	    fs::copy(src, dst, _err);
+		failReason = _err.message();
 	    return _err.value() == 0;
     }
 
@@ -38,4 +148,9 @@ namespace ulib { namespace File {
 	return fs::remove(filePath);
     }
 
-} }
+
+	
+
+} 
+
+}

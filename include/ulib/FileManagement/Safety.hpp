@@ -18,6 +18,25 @@ namespace ulib { namespace File {
     std::string name_of(const std::string& path);
     std::string to_portable_path(const std::string& path);
     std::string without_extension(const std::string& path);
+    inline bool has_directory(const std::string& file, const std::string& dirPath);
+
+    inline std::string offset_directory(const std::string& file, const std::string& dir)
+    {
+        std::string absFile = to_absolute(file);
+        std::string absDir = to_absolute(dir);
+
+        if (absDir[absDir.size() - 1] == '/' || absDir[absDir.size() - 1] == '\\') absDir.pop_back();
+
+        if (!has_directory(absFile, absDir)) return file;
+        
+        std::string absDirName = name_of(absDir);
+        return absFile.substr(absFile.find(absDirName) + absDirName.size() + 1);
+    }
+
+    inline bool is_valid(const std::string& path)
+    {
+        return path.find_first_not_of("a-to-zA-to-Z0-to-9_.") == std::string::npos;
+    }
 
     inline bool exists(const std::string& path, bool ignoreExtension) {
         if (ignoreExtension) {
@@ -86,13 +105,10 @@ namespace ulib { namespace File {
 	}
 
 	inline bool has_directory(const std::string& file, const std::string& dirPath) {
-		std::string _temp = file;
-		do {
-			if (ulib::File::is_same_path(_temp, dirPath)) return true;
-			_temp = directory_of(_temp);
-		} while (_temp != "");
+		std::string _file = to_portable_path(to_absolute(file));
+        std::string _dir = to_portable_path(to_absolute(dirPath));
 
-		return false;
+		return _file.find(_dir) != std::string::npos;
 	}
 
 	} 

@@ -31,6 +31,13 @@ namespace ulib {
 			return _err.value() == 0;
 		}
 
+		inline bool remove(const std::string& path)
+		{
+			std::error_code _err;
+			fs::remove_all(path, _err);
+			return _err.value() == 0;
+		}
+
 	}
 	
 	namespace File {
@@ -39,7 +46,7 @@ namespace ulib {
 
 		inline size_t file_size(const std::string& file)
 		{
-			std::ifstream in(file, std::ifstream::ate | std::ifstream::binary);
+			std::ifstream in(file);
 			return in.tellg();
 		}
 
@@ -67,6 +74,7 @@ namespace ulib {
 
 	inline bool write(const std::string& file, const std::vector<unsigned char>& data, bool binary = false)
 	{
+		if (data.size() == 0) return false;
 		if (!fs::exists(directory_of(file))) Directory::create_all(directory_of(file));
 		uofstream t;
 		if (binary)	t.open(file.c_str(), std::ios::binary);
@@ -108,11 +116,15 @@ namespace ulib {
 	{
 
 		uifstream t;
-		if (binary)	t.open(file.c_str(), std::ios::binary);
-		else		t.open(file.c_str());
+		if (binary)	t.open(file.c_str(), std::ios::binary | std::ios::in);
+		else		t.open(file.c_str(), std::ios::in);
 		if (t.is_open())
 		{
-			out->resize(file_size(file));
+			t.seekg(0, t.end);
+			auto length = t.tellg();
+			t.seekg(0, t.beg);
+			out->resize(length);
+			if (out->size() == 0) return true;
 			t.read(out->data(), out->size());
 			if (t.bad()) { t.close(); return false; }
 			t.close();
@@ -124,7 +136,7 @@ namespace ulib {
 		}
 	}
 
-    inline bool copy(const std::string& src, const std::string& dst, int dstExistFlags = ULIB_FAIL, std::string& failReason = std::string()) {
+    inline bool copy(const std::string& src, std::string dst, int dstExistFlags = ULIB_FAIL, std::string& failReason = std::string()) {
 
 		if (!fs::exists(src)) return false;
 
@@ -138,8 +150,13 @@ namespace ulib {
 
 		Directory::create_all(fs::path(dst).parent_path().generic_string());
 
+		for (int i = 0; i < dst.size(); i++)
+		{
+			if (dst[i] == '\\') dst[i] = '/';
+		}
+
 	    std::error_code _err;
-	    fs::copy(src, dst, _err);
+	    fs::copy(src, dst, fs::copy_options::recursive, _err);
 		failReason = _err.message();
 	    return _err.value() == 0;
     }

@@ -95,7 +95,7 @@ namespace ulib { namespace File {
     inline std::string without_extension(const std::string& path) {
         if (!has_extension(path)) return path;
         else {
-            auto _lastindex = path.find_last_of(".");
+            auto _lastindex = path.find_last_of('.');
             return path.substr(0, _lastindex);
         }
     }
